@@ -170,7 +170,7 @@ pub(crate) fn clone_owned(failure: &PluginFailure) -> PluginFailure {
 pub enum SpawnError {
     /// The spawning Context's fiber generation is closed to new
     /// registrations (stably Pending or Failed, draining, or disposed), or
-    /// the Runtime has been terminally closed by Context::shutdown.
+    /// the Runtime has been terminally closed by Context::close_plugins.
     /// Pre-commit: nothing was allocated.
     #[error("the spawning context or runtime is closed to new fibers")]
     InactiveContext,

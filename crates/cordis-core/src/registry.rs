@@ -194,11 +194,11 @@ impl crate::Context {
     /// admission, rather than waiting on itself. A pending creation still owned
     /// by a live spawn future must be completed or dropped by its caller; this
     /// operation never reports success before that Fiber reaches its barrier.
-    pub async fn shutdown(&self) -> Result<(), LifecycleRecursion> {
+    pub async fn close_plugins(&self) -> Result<(), LifecycleRecursion> {
         let residents = self.root.registry.close()?;
         let report = crate::framework_task::PanicReport {
             logger: self.logger(),
-            operation: "runtime shutdown",
+            operation: "terminal plugin removal",
             context: "all resident Fibers".to_owned(),
         };
         let root = self.root.clone();
@@ -206,9 +206,11 @@ impl crate::Context {
             futures::future::join_all(residents.iter().map(|fiber| fiber.dispose())).await;
             for fiber in residents {
                 let logger = root.logger.logger_for_fiber(&fiber.name);
-                crate::contained::contain("shutdown member destruction", Some(&logger), || {
-                    drop(fiber)
-                });
+                crate::contained::contain(
+                    "terminal removal member destruction",
+                    Some(&logger),
+                    || drop(fiber),
+                );
             }
         })
         .await;

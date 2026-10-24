@@ -80,8 +80,8 @@ Residency does not imply lifecycle ownership, and dropping every FiberHandle
 changes neither residency nor lifecycle.
 _Avoid_: ownership, reachability through a FiberHandle
 
-**Runtime termination**
-An explicit terminal `Context::shutdown` operation closes new Fiber admission
+**terminal plugin admission**
+An explicit `Context::close_plugins` operation closes new Fiber admission
 and joins the exact cleanup/unlink barriers of every resident non-root Fiber,
 including detached allocations. It is not a Fiber parenthood relation, a Roster,
 or durable external-effect reconciliation. The permanent root Fiber remains;
